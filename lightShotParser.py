@@ -1,6 +1,5 @@
-import requests, time, shutil
+import requests, time, shutil, itertools
 from bs4 import BeautifulSoup as bs
-
 
 
 headers = {
@@ -10,11 +9,9 @@ headers = {
 
 base_url = 'https://prnt.sc/'
 
-file_path = '/home/gabichus/parser/img/'
+file_path = 'D:\pyth\parser\LightShotParser-master\img'
 
-symbols = list('abcdefghijklmnopqrstuvwxyz123456789')
-
-url_index = list('zzzbbz')
+symbols = list('abcdefghijklmnopqrstuvwxyz0123456789')
 
 
 def parser(base_url, headers):
@@ -33,30 +30,19 @@ def parser(base_url, headers):
 def downloadImage(imgUrl, imgIndex):
     r = requests.get(imgUrl, stream=True)
     if r.status_code == 200:
-        with open(file_path + imgIndex + '.png', 'wb') as f:
+        with open(file_path +'\\'+ imgIndex + '.png', 'wb') as f:
             r.raw.decode_content = True
             shutil.copyfileobj(r.raw, f)
 
 
-# for x in range(6):
-#     for s in symbols:
-#         temp = url_index
-#         temp[x] = s
-#         tempStr = ''.join(temp)
-#         imgUrl = parser(base_url + tempStr, headers)
-#         if imgUrl is not None:
-#             print(imgUrl)
-#             downloadImage(imgUrl,tempStr)
+def foo(l):
+     yield from itertools.product(*([l] * 6)) 
 
-
-while(True):
-    if url_index[5] is 'a':
-        for x in range(6):
-            if url_index[x] is 'a':
-                url_index[x] = 'z'
-                url_index[x-1] = symbols[symbols.index(url_index[x-1])-1]
-    url_index[5] = symbols[symbols.index(url_index[5])-1]
-    print(url_index)
-    time.sleep(0.1)
-
+for x in foo(symbols):
+    url_index=''.join(x)
+    tempStr = ''.join(url_index)
+    imgUrl = parser(base_url + tempStr, headers)
+    if imgUrl is not None:
+        print(imgUrl)
+        downloadImage(imgUrl,tempStr)
     
